@@ -5,9 +5,11 @@ using UnityEngine;
 
 public class Piece : MonoBehaviour
 {
-    [SerializeField] private Camera cam;
+    public Camera cam;
     private void OnMouseDrag()
     {
         transform.position = (Vector2)cam.ScreenToWorldPoint(Input.mousePosition);
     }
+
+    
 }
