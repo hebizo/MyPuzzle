@@ -2,7 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using OpenCvSharp;
+using OpenCVForUnity.ImgprocModule;
+using OpenCVForUnity.UnityUtils;
+using OpenCVForUnity.CoreModule;
 
 public class PieceMaker : MonoBehaviour
 {
@@ -23,11 +25,8 @@ public class PieceMaker : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        // preprocess
-        // get SpriteRenderer of piece
-
         // resize image
-        //Texture2D imageRes = ResizeImage(rawImage);
+        Texture2D imageResize = ResizeImage(rawImage);
         
         //GameObject obj = Instantiate(piece);
         //SpriteRenderer sr = obj.GetComponent<SpriteRenderer>();
@@ -37,18 +36,30 @@ public class PieceMaker : MonoBehaviour
         // make image for piece
 
         // make piece
-        Texture2D[] images = {testImage1, testImage2, testImage3};
+        Texture2D[] images = {testImage1, testImage2, testImage3, imageResize};
         CreatePiece(images);
     }
 
     // function for resizing raw image
+    
     private Texture2D ResizeImage(Texture2D image)
     {
-        Mat imageMat = OpenCvSharp.Unity.TextureToMat(image);
-        Cv2.Resize(imageMat, imageMat, new OpenCvSharp.Size(width, height));
-        Texture2D imageRes = OpenCvSharp.Unity.MatToTexture(imageMat);
-        return imageRes;
+        // change texture2D to mat
+        Mat imageMat = new Mat(image.height, image.width, CvType.CV_8UC4);
+        Utils.texture2DToMat(image, imageMat);
+        
+        // resize mat
+        Mat matResize = new Mat(height, width, CvType.CV_8UC4);
+        Imgproc.resize(imageMat, matResize, matResize.size());
+        
+        // change mat to texture2D
+        Texture2D imageResize = new Texture2D(matResize.cols(), matResize.rows(), TextureFormat.RGBA32, false);
+        Utils.matToTexture2D(matResize, imageResize);
+
+        //return imageResize;
+        return imageResize;
     }
+    
 
     //private Image[] TrimImage(Texture2D image)
     //{

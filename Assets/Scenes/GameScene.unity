@@ -237,7 +237,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2194775973712608422, guid: 45fd7889698f745ee8a78e8353c8786a, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5546347038807153874, guid: 45fd7889698f745ee8a78e8353c8786a, type: 3}
       propertyPath: cam
@@ -317,7 +317,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dab43d499df7341348840e980886cb3c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rawImage: {fileID: 2800000, guid: b62d23dfb83e54fe1bd08ed539c97843, type: 3}
+  rawImage: {fileID: 2800000, guid: 38ed2e111981647b087956c0319bd2cf, type: 3}
   piece: {fileID: 2194775973712608422, guid: 45fd7889698f745ee8a78e8353c8786a, type: 3}
   width: 810
   height: 540
