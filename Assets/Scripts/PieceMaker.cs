@@ -21,10 +21,6 @@ public class PieceMaker : MonoBehaviour
 
     [SerializeField] private Camera mainCamera;
 
-    [SerializeField] private Texture2D testImage1;
-    [SerializeField] private Texture2D testImage2;
-    [SerializeField] private Texture2D testImage3;
-    
     // Start is called before the first frame update
     void Start()
     {
