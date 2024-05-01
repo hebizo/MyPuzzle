@@ -70,3 +70,9 @@ crashlytics-build.properties
 # OpenCV + Unity
 /[Aa]ssets/OpenCV+Unity
 /[Aa]ssets/OpenCV+Unity.meta
+
+# OpenCVForUnity
+/[Aa]ssets/OpenCVForUnity
+/[Aa]ssets/OpenCVForUnity.meta
+/[Aa]ssets/StreamingAssets
+/[Aa]ssets/StreamingAssets.meta
