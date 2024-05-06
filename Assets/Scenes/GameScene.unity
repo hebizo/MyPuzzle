@@ -317,16 +317,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dab43d499df7341348840e980886cb3c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  pieceNum: 0
   rawImage: {fileID: 2800000, guid: 38ed2e111981647b087956c0319bd2cf, type: 3}
   piece: {fileID: 2194775973712608422, guid: 45fd7889698f745ee8a78e8353c8786a, type: 3}
-  width: 810
-  height: 540
   pieceRow: 3
-  pieceCol: 3
+  pieceCol: 4
   mainCamera: {fileID: 519420031}
-  testImage1: {fileID: 2800000, guid: b62d23dfb83e54fe1bd08ed539c97843, type: 3}
-  testImage2: {fileID: 2800000, guid: c853f7113641f4ba1a949a29e748754e, type: 3}
-  testImage3: {fileID: 2800000, guid: 0f5835224fa564f96b835daf527d3462, type: 3}
 --- !u!4 &968904315
 Transform:
   m_ObjectHideFlags: 0
