@@ -96,9 +96,12 @@ public class PieceMaker : MonoBehaviour
 
     private void CreatePiece(Texture2D[] images)
     {
+        float posX = -6.5f;
+        float intervalX = 13f / (images.Length - 1);
         foreach (Texture2D img in images)
         {
-            Vector3 pos = new Vector3(0f, 0f, 0f);
+            Vector3 pos = new Vector3(posX, -4.0f, 0f);
+            posX += intervalX;
             GameObject pieceIns = Instantiate(piece, pos, Quaternion.identity);
             
             // attach each image to piece
