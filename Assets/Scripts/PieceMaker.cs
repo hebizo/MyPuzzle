@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 using OpenCVForUnity.ImgprocModule;
@@ -23,6 +24,9 @@ public class PieceMaker : MonoBehaviour
     [SerializeField] private int pieceCol;
 
     [SerializeField] private Camera mainCamera;
+
+    [SerializeField] private int blurSize;
+    [SerializeField] private float sizeCor;
 
     // Start is called before the first frame update
     void Start()
@@ -81,7 +85,7 @@ public class PieceMaker : MonoBehaviour
             {
                 // get submatrix
                 Mat pieceMat = new Mat(pieceHeight,pieceWidth,CvType.CV_8UC4);
-                imageMat.rowRange(new Range(j*pieceHeight,(j+1)*pieceHeight)).colRange(new Range(i*pieceWidth,(i+1)*pieceWidth)).copyTo(pieceMat);
+                imageMat.rowRange(new OpenCVForUnity.CoreModule.Range(j*pieceHeight,(j+1)*pieceHeight)).colRange(new OpenCVForUnity.CoreModule.Range(i*pieceWidth,(i+1)*pieceWidth)).copyTo(pieceMat);
                 
                 // change mat to texture2D
                 Texture2D imagePiece = new Texture2D(pieceMat.cols(), pieceMat.rows(), TextureFormat.RGBA32, false);
@@ -116,8 +120,8 @@ public class PieceMaker : MonoBehaviour
     private Texture2D[] LoadPieceImage()
     {
         // calculate piece size
-        int pieceHeight = _height / pieceRow;
-        int pieceWidth = _width / pieceCol;
+        int pieceHeight = (int)Math.Round(_height / pieceRow * sizeCor);
+        int pieceWidth = (int)Math.Round(_width / pieceCol * sizeCor);
         
         Texture2D[] images = Resources.LoadAll<Texture2D>("Images/Pieces");
         images = Black2Transparent(images);
@@ -140,12 +144,16 @@ public class PieceMaker : MonoBehaviour
             
             Mat imageMat = new Mat(image.height, image.width, CvType.CV_8UC4);
             Utils.texture2DToMat(image, imageMat);
+            
+            // Smoothing
+            Mat blurMat = new Mat(image.height, image.width, CvType.CV_8UC4);
+            Imgproc.GaussianBlur(imageMat, blurMat, new Size(blurSize, blurSize), 0.0, 0.0);
 
-            for (int y = 0; y < imageMat.rows(); y++)
+            for (int y = 0; y < blurMat.rows(); y++)
             {
-                for (int x = 0; x < imageMat.cols(); x++)
+                for (int x = 0; x < blurMat.cols(); x++)
                 {
-                    double[] pixel = imageMat.get(y, x);
+                    double[] pixel = blurMat.get(y, x);
                     
                     // change black pixel to transparent
                     if (pixel[0] == 0 && pixel[1] == 0 && pixel[2] == 0)
