@@ -76,3 +76,6 @@ crashlytics-build.properties
 /[Aa]ssets/OpenCVForUnity.meta
 /[Aa]ssets/StreamingAssets
 /[Aa]ssets/StreamingAssets.meta
+
+# Images
+/[Aa]ssets/[Rr]esources
