@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 using OpenCVForUnity.ImgprocModule;
@@ -8,24 +9,30 @@ using OpenCVForUnity.CoreModule;
 
 public class PieceMaker : MonoBehaviour
 {
+    [SerializeField] private int pieceNum;
+    
     [SerializeField] private Texture2D rawImage;
     [SerializeField] private GameObject piece;
 
     private Image _image;
+    private Texture2D[] _images;
 
-    [SerializeField] private int width;
-    [SerializeField] private int height;
+    private int _width = 810;
+    private int _height = 540;
 
     [SerializeField] private int pieceRow;
     [SerializeField] private int pieceCol;
 
     [SerializeField] private Camera mainCamera;
 
+    [SerializeField] private int blurSize;
+    [SerializeField] private float sizeCor;
+
     // Start is called before the first frame update
     void Start()
     {
         // resize image
-        Texture2D imageResize = ResizeImage(rawImage);
+        //Texture2D imageResize = ResizeImage(rawImage, _height, _width);
         
         //GameObject obj = Instantiate(piece);
         //SpriteRenderer sr = obj.GetComponent<SpriteRenderer>();
@@ -33,15 +40,16 @@ public class PieceMaker : MonoBehaviour
 
 
         // make image for piece
-        Texture2D[] images = TrimImage(imageResize);
+        //Texture2D[] images = TrimImage(imageResize);
 
         // make piece
         //Texture2D[] images = {testImage1, testImage2, testImage3, imageResize};
-        CreatePiece(images);
+        _images = LoadPieceImage();
+        CreatePiece(_images);
     }
 
     // function for resizing raw image
-    private Texture2D ResizeImage(Texture2D image)
+    private Texture2D ResizeImage(Texture2D image, int height, int width)
     {
         // change texture2D to mat
         Mat imageMat = new Mat(image.height,image.width,CvType.CV_8UC4);
@@ -62,12 +70,12 @@ public class PieceMaker : MonoBehaviour
 
     private Texture2D[] TrimImage(Texture2D image)
     {
-        int pieceHeight = height / pieceRow;
-        int pieceWidth = width / pieceCol;
+        int pieceHeight = _height / pieceRow;
+        int pieceWidth = _width / pieceCol;
         Texture2D[] images = new Texture2D[pieceRow * pieceCol];
 
         // change texture2D to mat
-        Mat imageMat = new Mat(height, width, CvType.CV_8UC4);
+        Mat imageMat = new Mat(_height, _width, CvType.CV_8UC4);
         Utils.texture2DToMat(image, imageMat);
         
         // create images for pieces
@@ -77,7 +85,7 @@ public class PieceMaker : MonoBehaviour
             {
                 // get submatrix
                 Mat pieceMat = new Mat(pieceHeight,pieceWidth,CvType.CV_8UC4);
-                imageMat.rowRange(new Range(j*pieceHeight,(j+1)*pieceHeight)).colRange(new Range(i*pieceWidth,(i+1)*pieceWidth)).copyTo(pieceMat);
+                imageMat.rowRange(new OpenCVForUnity.CoreModule.Range(j*pieceHeight,(j+1)*pieceHeight)).colRange(new OpenCVForUnity.CoreModule.Range(i*pieceWidth,(i+1)*pieceWidth)).copyTo(pieceMat);
                 
                 // change mat to texture2D
                 Texture2D imagePiece = new Texture2D(pieceMat.cols(), pieceMat.rows(), TextureFormat.RGBA32, false);
@@ -92,9 +100,12 @@ public class PieceMaker : MonoBehaviour
 
     private void CreatePiece(Texture2D[] images)
     {
+        float posX = -6.5f;
+        float intervalX = 13f / (images.Length - 1);
         foreach (Texture2D img in images)
         {
-            Vector3 pos = new Vector3(0f, 0f, 0f);
+            Vector3 pos = new Vector3(posX, -4.0f, 0f);
+            posX += intervalX;
             GameObject pieceIns = Instantiate(piece, pos, Quaternion.identity);
             
             // attach each image to piece
@@ -104,5 +115,60 @@ public class PieceMaker : MonoBehaviour
             // attach main camera to piece
             pieceIns.GetComponent<Piece>().cam = mainCamera;
         }
+    }
+
+    private Texture2D[] LoadPieceImage()
+    {
+        // calculate piece size
+        int pieceHeight = (int)Math.Round(_height / pieceRow * sizeCor);
+        int pieceWidth = (int)Math.Round(_width / pieceCol * sizeCor);
+        
+        Texture2D[] images = Resources.LoadAll<Texture2D>("Images/Pieces");
+        images = Black2Transparent(images);
+        
+        // resize piece
+        for (int i = 0; i < images.Length; i++)
+        {
+            images[i] = ResizeImage(images[i], pieceHeight, pieceWidth);
+        }
+        
+        return images;
+    }
+
+    private Texture2D[] Black2Transparent(Texture2D[] images)
+    {
+        Texture2D[] imageRet = new Texture2D[images.Length];
+        for (int i = 0; i < images.Length; i++)
+        {
+            Texture2D image = images[i];
+            
+            Mat imageMat = new Mat(image.height, image.width, CvType.CV_8UC4);
+            Utils.texture2DToMat(image, imageMat);
+            
+            // Smoothing
+            Mat blurMat = new Mat(image.height, image.width, CvType.CV_8UC4);
+            Imgproc.GaussianBlur(imageMat, blurMat, new Size(blurSize, blurSize), 0.0, 0.0);
+
+            for (int y = 0; y < blurMat.rows(); y++)
+            {
+                for (int x = 0; x < blurMat.cols(); x++)
+                {
+                    double[] pixel = blurMat.get(y, x);
+                    
+                    // change black pixel to transparent
+                    if (pixel[0] == 0 && pixel[1] == 0 && pixel[2] == 0)
+                    {
+                        pixel[3] = 0;
+                        imageMat.put(y, x, pixel);
+                    }
+                }
+            }
+            
+            Texture2D imagePiece = new Texture2D(imageMat.cols(), imageMat.rows(), TextureFormat.RGBA32, false);
+            Utils.matToTexture2D(imageMat, imagePiece);
+            imageRet[i] = imagePiece;
+        }
+
+        return imageRet;
     }
 }
