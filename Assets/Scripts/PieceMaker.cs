@@ -12,7 +12,7 @@ public class PieceMaker : MonoBehaviour
     [SerializeField] private int pieceNum;
     
     [SerializeField] private Texture2D rawImage;
-    [SerializeField] private GameObject piece;
+    [SerializeField] private GameObject piece, pictureManager;
 
     private Image _image;
     private Texture2D[] _images;
@@ -44,7 +44,13 @@ public class PieceMaker : MonoBehaviour
 
         // make piece
         //Texture2D[] images = {testImage1, testImage2, testImage3, imageResize};
-        _images = LoadPieceImage();
+        //_images = LoadPieceImage();
+        //CreatePiece(_images);
+    }
+
+    public void CreateAllPieces(Texture2D[] texture2Ds)
+    {
+        _images = LoadPieceImage(texture2Ds);
         CreatePiece(_images);
     }
 
@@ -117,13 +123,14 @@ public class PieceMaker : MonoBehaviour
         }
     }
 
-    private Texture2D[] LoadPieceImage()
+    private Texture2D[] LoadPieceImage(Texture2D[] images)
     {
         // calculate piece size
         int pieceHeight = (int)Math.Round(_height / pieceRow * sizeCor);
         int pieceWidth = (int)Math.Round(_width / pieceCol * sizeCor);
         
-        Texture2D[] images = Resources.LoadAll<Texture2D>("Images/Pieces");
+        //Texture2D[] images = Resources.LoadAll<Texture2D>("Images/Pieces");
+        
         images = Black2Transparent(images);
         
         // resize piece
